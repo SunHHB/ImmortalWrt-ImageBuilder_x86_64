@@ -7,7 +7,7 @@ mkdir -p files/etc/openclash && cd files/etc/openclash
 
 
 
-CLASH_META_URL="https://github.com/SunHHB/ShellCrash/raw/refs/heads/dev/bin/meta/clash-linux-amd64"
+CLASH_META_URL="https://github.com/SunHHB/ShellCrash/raw/refs/heads/dev/bin/meta/clash-linux-armv8"
 
 CORE_MATE="https://github.com/SunHHB/ShellCrash/raw/master/bin/meta/clash-linux-amd64.tar.gz"
 
