@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Generate x86_64-23.05 immortalwrt Firmware
+name: Generate arm64 immortalwrt Firmware
 
 # Controls when the workflow will run
 on:
@@ -56,13 +56,13 @@ jobs:
 
       - name: Download Image Builder
         run: |
-          wget $DOWNLOAD_BASE/releases/$VERSION/targets/x86/64/$VENDOR-imagebuilder-$VERSION-x86-64.Linux-x86_64.tar.xz
-          tar -xvf $VENDOR-imagebuilder-$VERSION-x86-64.Linux-x86_64.tar.xz
-          rm -rf $VENDOR-imagebuilder-$VERSION-x86-64.Linux-x86_64.tar.xz
-          cp -r $GITHUB_WORKSPACE/origin/* $GITHUB_WORKSPACE/$VENDOR-imagebuilder-$VERSION-x86-64.Linux-x86_64/
+          wget $DOWNLOAD_BASE/releases/$VERSION/targets/armsr/armv8/$VENDOR-imagebuilder-$VERSION-armsr-armv8.Linux-x86_64.tar.xz
+          tar -xvf $VENDOR-imagebuilder-$VERSION-armsr-armv8.Linux-x86_64.tar.xz
+          rm -rf $VENDOR-imagebuilder-$VERSION-armsr-armv8.Linux-x86_64.tar.xz
+          cp -r $GITHUB_WORKSPACE/origin/* $GITHUB_WORKSPACE/$VENDOR-imagebuilder-$VERSION-armsr-armv8.Linux-x86_64/
       
       - name: Download External Packages
-        working-directory: ${{ env.VENDOR }}-imagebuilder-${{ env.VERSION }}-x86-64.Linux-x86_64
+        working-directory: ${{ env.VENDOR }}-imagebuilder-${{ env.VERSION }}-armsr-armv8.Linux-x86_64
         run: |
           cat external-package-urls23.05.txt | xargs wget -P packages
           cd ./packages/
@@ -70,7 +70,7 @@ jobs:
           rm *tar.gz
       
       - name: Run Patch and DIY Scripts
-        working-directory: ${{ env.VENDOR }}-imagebuilder-${{ env.VERSION }}-x86-64.Linux-x86_64
+        working-directory: ${{ env.VENDOR }}-imagebuilder-${{ env.VERSION }}-armsr-armv8.Linux-x86_64
         run: |
           sed -i "s/192\.168\.[0-9]*\.[0-9]*/${{ github.event.inputs.LAN_IP }}/g" files/etc/uci-defaults/99-init-settings
           bash scripts/builder-patch.sh
@@ -78,15 +78,15 @@ jobs:
           bash scripts/zsh.sh
 
       - name: Generate Firmware
-        working-directory: ${{ env.VENDOR }}-imagebuilder-${{ env.VERSION }}-x86-64.Linux-x86_64
+        working-directory: ${{ env.VENDOR }}-imagebuilder-${{ env.VERSION }}-armsr-armv8.Linux-x86_64
         run: |
           bash build.sh
 
       - name: Upload Firmware to Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.VENDOR }}-${{ env.VERSION }}-x86_64-images-${{ env.DATETIME }}
-          path: ${{ env.VENDOR }}-imagebuilder-${{ env.VERSION }}-x86-64.Linux-x86_64/bin/targets/x86/64/*
+          name: ${{ env.VENDOR }}-${{ env.VERSION }}-armsr/armv8-images-${{ env.DATETIME }}
+          path: ${{ env.VENDOR }}-imagebuilder-${{ env.VERSION }}-armsr-armv8.Linux-x86_64/bin/targets/armsr/armv8/*
 
       - name: Upload Firmware to Release
         if: github.event.inputs.release == 'true'
@@ -94,9 +94,9 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
-          file: ${{ env.VENDOR }}-imagebuilder-${{ env.VERSION }}-x86-64.Linux-x86_64/bin/targets/x86/64/*
+          file: ${{ env.VENDOR }}-imagebuilder-${{ env.VERSION }}-armsr-armv8.Linux-x86_64/bin/targets/armsr/armv8/*
           asset_name: ${{ github.event.repository.name }}-${{ github.sha }}
-          tag: ${{ env.VENDOR }}-${{ env.VERSION }}-x86_64-${{ env.DATETIME }}
+          tag: ${{ env.VENDOR }}-${{ env.VERSION }}--armsr-armv8-${{ env.DATETIME }}
           overwrite: true
           body: |
             地址：${{ github.event.inputs.LAN_IP }}
